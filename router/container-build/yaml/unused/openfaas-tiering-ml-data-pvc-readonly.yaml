@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openfaas-tiering-ml-data-pvc-readonly
+  namespace: openfaas-tiering
+spec:
+  dataSource:
+    name: openfaas-tiering-ml-data-pvc-snapshot # Name of the snapshot from step 2
+    kind: VolumeSnapshot
+    apiGroup: snapshot.storage.k8s.io
+  accessModes:
+    - ReadOnlyMany # The desired access mode
+  resources:
+    requests:
+      storage: 200Mi
+  storageClassName: standard # Must be the same storage class
+  #storageClassName: pd.csi.storage.gke.io # Must be the same storage class
+  
+# https://www.google.com/search?q=InvalidArgument+desc+%3D+VolumeCapabilities+is+invalid%3A+specified+multi+writer+with+mount+access+type&sca_esv=08164f2df1951073&rlz=1C1CHBF_enUS1071US1071&udm=50&fbs=AIIjpHxU7SXXniUZfeShr2fp4giZ1Y6MJ25_tmWITc7uy4KIeioyp3OhN11EY0n5qfq-zEMZldv_eRjZ2XLYc5GnVnME7glWodDcaQwvGYJtospyF4hao4VocMoniUVvlzzwRcB_gh46MHhrDPH5NOVwPivjadeakFm05zxnpGxC0pvMBL6-v6zKyyE5nBk0bvDg1EPDxHf7xVk4s29Sxnujftn4liXpkA&aep=1&ntc=1&sa=X&ved=2ahUKEwjDwOKjlN6QAxUKm2oFHRIWOuYQ2J8OegQIExAE&biw=2880&bih=1366&dpr=0.67&mstk=AUtExfAYMkvvLPSynK1vDkjNz5vvcIbP_TByJQAcjAF7OVGFl4xJoXJQPc9iP9n69GlAUwqyQ8hzfMkzvnCq4ozrI5jUjHM9V-3bwZp-lBm8vXpqkvsUYBglKeHHs6pOP7j6lr8wABa5P-cW79_wXgXVdhKo_7Y693UengNAfZWfGyX0c3z7pYlSy4t-OwNBREkvZfsor8RjuU1xl2NsceLcldlf0o0NECWbubv8wXSZxUdfaRY2jWgFII2-xQ&csuir=1

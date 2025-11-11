@@ -1,0 +1,6 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: gke-pd-snapshot-class # You can choose any name for the class
+driver: pd.csi.storage.gke.io # Use the GKE PD CSI driver
+deletionPolicy: Delete # or Retain

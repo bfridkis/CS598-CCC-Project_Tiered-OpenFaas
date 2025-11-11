@@ -1,0 +1,19 @@
+# openfaas-preprocessor-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: openfaas-preprocessor-service
+  namespace: openfaas-tiering
+spec:
+  selector:
+    app: openfaas-preprocessor
+  type: LoadBalancer # Or NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5055 # Or your Flask app's port
+    
+# Apply with 'kubectl apply -f openfaas-preprocessor-service.yaml'
+
+# References
+# https://www.google.com/search?q=deploying+a+flask+app+as+a+container+to+an+existing+kubernetes+cluster+with+an+external+address+exposed+and+that+can+write+to+persistent+storage&sca_esv=89c0b9e6faeb52cb&rlz=1C1CHBF_enUS1071US1071&ei=B34Dab6xAZStmtkPzs6PsAI&ved=0ahUKEwj-0JrOmMyQAxWUliYFHU7nAyYQ4dUDCBM&uact=5&oq=deploying+a+flask+app+as+a+container+to+an+existing+kubernetes+cluster+with+an+external+address+exposed+and+that+can+write+to+persistent+storage&gs_lp=Egxnd3Mtd2l6LXNlcnAikAFkZXBsb3lpbmcgYSBmbGFzayBhcHAgYXMgYSBjb250YWluZXIgdG8gYW4gZXhpc3Rpbmcga3ViZXJuZXRlcyBjbHVzdGVyIHdpdGggYW4gZXh0ZXJuYWwgYWRkcmVzcyBleHBvc2VkIGFuZCB0aGF0IGNhbiB3cml0ZSB0byBwZXJzaXN0ZW50IHN0b3JhZ2VIAFAAWABwAHgBkAEAmAEAoAEAqgEAuAEDyAEA-AEBmAIAoAIAmAMAkgcAoAcAsgcAuAcAwgcAyAcA&sclient=gws-wiz-serp

@@ -1,0 +1,47 @@
+# openfaas-preprocessor-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openfaas-preprocessor
+  namespace: openfaas-tiering
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openfaas-preprocessor
+  template:
+    metadata:
+      labels:
+        app: openfaas-preprocessor
+    spec:
+      initContainers:
+      - name: create-directories
+        image: busybox # A lightweight image with shell utilities
+        command: ["sh", "-c", "mkdir -p /app/data/results/callback /app/data/results/request"] # Adjust mount path and directories as needed
+        volumeMounts:
+          - name: nfs-pvc
+            mountPath: /app/data
+      containers:
+      - name: openfaas-preprocessor
+        #image: bfridthekid/openfaas-preprocessor:latest
+        image: bfridthekid/openfaas-preprocessor@sha256:5e76773d1ed9e1c38cd1c4773c11779cafc7412bda0c2d8b317836fea032cf92   # Use image hash directly if 'imagePullPolicy: Always' isn't working like it wasn't for me!
+        imagePullPolicy: Always
+        # command: ["/bin/sh", "-c", "mkdir -p /app/data/results/callback /app/data/results/request"]
+        ports:
+        - containerPort: 5055 # Or your Flask app's port
+        volumeMounts:
+        - name: nfs-pvc
+          mountPath: /app/data # Path inside the container for persistent data
+      volumes:
+      - name: nfs-pvc
+        persistentVolumeClaim:
+          claimName: nfs-pvc
+      - name: init-scripts-volume
+        configMap:
+          name: init-container-script-cm
+          defaultMode: 0755
+          
+# Apply with 'kubectl apply -f openfaas-preprocessor-deployment.yaml'
+
+# References
+# https://www.google.com/search?q=deploying+a+flask+app+as+a+container+to+an+existing+kubernetes+cluster+with+an+external+address+exposed+and+that+can+write+to+persistent+storage&sca_esv=89c0b9e6faeb52cb&rlz=1C1CHBF_enUS1071US1071&ei=B34Dab6xAZStmtkPzs6PsAI&ved=0ahUKEwj-0JrOmMyQAxWUliYFHU7nAyYQ4dUDCBM&uact=5&oq=deploying+a+flask+app+as+a+container+to+an+existing+kubernetes+cluster+with+an+external+address+exposed+and+that+can+write+to+persistent+storage&gs_lp=Egxnd3Mtd2l6LXNlcnAikAFkZXBsb3lpbmcgYSBmbGFzayBhcHAgYXMgYSBjb250YWluZXIgdG8gYW4gZXhpc3Rpbmcga3ViZXJuZXRlcyBjbHVzdGVyIHdpdGggYW4gZXh0ZXJuYWwgYWRkcmVzcyBleHBvc2VkIGFuZCB0aGF0IGNhbiB3cml0ZSB0byBwZXJzaXN0ZW50IHN0b3JhZ2VIAFAAWABwAHgBkAEAmAEAoAEAqgEAuAEDyAEA-AEBmAIAoAIAmAMAkgcAoAcAsgcAuAcAwgcAyAcA&sclient=gws-wiz-serp

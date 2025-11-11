@@ -1,0 +1,22 @@
+# gateway-patch.yaml
+spec:
+  template:
+    spec:
+      containers:
+      - name: gateway
+        env:
+        - name: upstream_timeout
+          value: 5m
+        - name: read_timeout
+          value: 5m05s
+        - name: write_timeout
+          value: 5m05s
+      - name: operator
+        env:
+          - name: read_timeout
+            value: 5m05s
+          - name: write_timeout
+            value: 5m05s
+          
+# Run with:
+# kubectl patch deployment gateway --type=strategic -n openfaas --patch-file gateway-patch.yaml

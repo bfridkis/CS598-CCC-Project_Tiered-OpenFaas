@@ -1,0 +1,13 @@
+# openfaas-tiering-ml-data-pvc-snapshot.yaml
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: openfaas-tiering-ml-data-pvc-snapshot
+  namespace: openfaas-tiering
+spec:
+  volumeSnapshotClassName: gke-pd-snapshot-class
+  source:
+    persistentVolumeClaimName: openfaas-tiering-ml-data-pvc
+
+# References
+# https://www.google.com/search?q=how+to+snapshot+a+pvc+and+use+it+to+create+a+new+pvc&sca_esv=0ce76fe6310e19b4&rlz=1C1CHBF_enUS1071US1071&ei=ejoNaeCVA6SmqtsPkNOQ4Qc&ved=0ahUKEwjguqPM4d6QAxUkk2oFHZApJHwQ4dUDCBE&uact=5&oq=how+to+snapshot+a+pvc+and+use+it+to+create+a+new+pvc&gs_lp=Egxnd3Mtd2l6LXNlcnAiNGhvdyB0byBzbmFwc2hvdCBhIHB2YyBhbmQgdXNlIGl0IHRvIGNyZWF0ZSBhIG5ldyBwdmMyBRAhGKABMgUQIRigATIFECEYoAFIlU9QAFi9TnAAeAGQAQGYAdcBoAHnMKoBBjkuNDEuMbgBA8gBAPgBAZgCMqAC0jLCAgsQABiABBiRAhiKBcICFhAuGIAEGLEDGNEDGEMYgwEYxwEYigXCAhEQLhiABBixAxjRAxiDARjHAcICDhAuGIAEGLEDGNEDGMcBwgILEAAYgAQYsQMYgwHCAgYQABgDGArCAgUQABiABMICCBAAGIAEGLEDwgIKEAAYgAQYQxiKBcICFBAuGIAEGMcBGJgFGJ4FGI4FGK8BwgILEC4YgAQYsQMY1ALCAg4QABiABBixAxiDARiKBcICBBAAGAPCAgYQABgWGB7CAggQABgWGAoYHsICCxAAGIAEGIYDGIoFwgIIEAAYgAQYogTCAggQABiiBBiJBcICBRAhGKsCwgIFEAAY7wXCAgUQIRifBZgDAJIHBDYuNDSgB5XzArIHBDYuNDS4B9IywgcJMC40LjMyLjE0yAfCAg&sclient=gws-wiz-serp

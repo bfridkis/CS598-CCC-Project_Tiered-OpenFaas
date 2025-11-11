@@ -1,0 +1,16 @@
+# managed-filestore-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: managed-filestore-pvc
+  namespace: openfaas-tiering
+spec:
+  accessModes:
+    - ReadWriteMany 
+  storageClassName: standard-rwx # Uses Basic HDD tier by default
+  resources:
+    requests:
+      storage: 100Gi # Request 100 GiB
+
+# References (AI)
+# https://www.google.com/search?q=what+is+the+best+nfs-server+image+for+gke+nfs+pvc&sca_esv=f428b6d1b594cc50&rlz=1C1CHBF_enUS1071US1071&udm=50&fbs=AIIjpHxU7SXXniUZfeShr2fp4giZ59Aj-dkSgmXWKpa2HWaBZDtyvvIn4PVHl081BMOU6hoprXxfr-qpT0UGGVzMIyugYQSroB4nyOhUYDIWQxQEb3aOapJa4WmB8YO0ARQCwEEkWGWFu55-cA2nqEUW3eEM6F4VM6ntGmFvuJPhAFELSqPwUZTQUrWKr2mTAyt9Bz8ttHe5wsgPrwcS8sQ_uGK7xjTsXg&aep=1&ntc=1&sa=X&ved=2ahUKEwie9I_u8-CQAxUcg2oFHbxjM6MQ2J8OegQIDRAE&biw=2560&bih=1214&dpr=0.75&mstk=AUtExfCP58zTew46iisst-qCWI2t0Tae0RCjeBvbqBnspl1sLBlcnRIptmuloo3Gpgvsr2mogbtRdIrBmur5wfuvMX5sbGKD9b6FClNq8qpquX4pt_ZXumb3nCddj0o5N0u6roKuQzpVMHWQsYGw7YHwBEX56gp9itZZ2Br_TbgyQMwC7vqHdTCfDfR4NFvSo859JfoCuW8VTdi8VMLr5OpWW7BYnTD06SFcGjn05Ldoyrj-kTy1k6cM7f6Y1w&csuir=1

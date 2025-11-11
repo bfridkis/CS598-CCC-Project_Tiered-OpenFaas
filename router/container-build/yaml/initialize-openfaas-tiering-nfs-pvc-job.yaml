@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: initialize-openfaas-tiering-nfs-pvc
+  namespace: openfaas-tiering
+spec:
+  template:
+    spec:
+      containers:
+      - name: initialize-openfaas-tiering-nfs-pvc-container
+        #image: alpine:latest # Or any image that has 'sh' and 'cp'
+        image: bfridthekid/openfaas-tiering-nfs-pvc-init@sha256:e4a906ade54251f4519c4bd4d404a514dbfb975028ff0cb317a18a083e4b9958
+        command:  ["/bin/sh", "/scripts/init-container-script.sh"]
+        volumeMounts:
+        - name: nfs-pvc
+          mountPath: /data
+        - name: init-scripts-volume
+          mountPath: /scripts
+      volumes:
+        - name: nfs-pvc
+          persistentVolumeClaim:
+            claimName: nfs-pvc
+        - name: init-scripts-volume
+          configMap:
+            name: init-container-script-cm
+            defaultMode: 0755
+      restartPolicy: OnFailure # The Job will retry if the script fails, and stop when it succeeds

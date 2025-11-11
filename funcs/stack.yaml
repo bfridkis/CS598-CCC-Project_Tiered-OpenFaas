@@ -1,0 +1,391 @@
+version: 1.0
+provider:
+  name: openfaas
+  #gateway: http://127.0.0.1:8080
+functions:
+  sleep-hi-tier:
+    lang: python3-http
+    handler: ./sleep
+    image: docker.io/bfridthekid/sleep:0.1
+    annotations: { 
+                   # com.openfaas.scale.min: "3",
+                   com.openfaas.scale.max: "20", 
+                   com.openfaas.scale.type: "queue", 
+                   com.openfaas.scale.target: "1", 
+                   com.openfaas.scale.target-proportion: "1" 
+                  }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 1
+    requests: { cpu: "25m", memory: "256Mi" }
+    limits:   { cpu: "500m", memory: "512Mi" }
+    labels:
+      com.openfaas.scale.zero: true             #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.zero-duration: "1s"    #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.min: "0"               #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      # com.openfaas.scale.min: "3"
+      # com.openfaas.scale.max: "20"
+      com.openfaas.scale.type: "queue"
+      com.openfaas.scale.target: "1"
+      com.openfaas.scale.target-proportion: "1"
+      
+  
+  sleep-med-tier:
+    lang: python3-http
+    handler: ./sleep
+    image: docker.io/bfridthekid/sleep:0.1
+    annotations: { com.openfaas.scale.min: "1", com.openfaas.scale.max: "10" }
+    #environment: { BUSY_MS: "0" }
+    environment: { PYTHONUNBUFFERED: "1" }
+    requests: { cpu: "15m", memory: "128Mi" }
+    limits:   { cpu: "300m", memory: "256Mi" }
+    labels:
+      com.openfaas.scale.zero: true             #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.zero-duration: "1s"    #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.min: "0"               #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      # com.openfaas.scale.min: "1"
+      # com.openfaas.scale.max: "10"
+
+  sleep-low-tier:
+    lang: python3-http
+    handler: ./sleep
+    image: docker.io/bfridthekid/sleep:0.1
+    annotations: { com.openfaas.scale.min: "0", com.openfaas.scale.max: "5" }
+    #environment: { BUSY_MS: "0" }
+    environment: { PYTHONUNBUFFERED: "1" }
+    requests: { cpu: "5m",  memory: "64Mi" }
+    limits:   { cpu: "200m", memory: "128Mi" }
+    labels:
+      com.openfaas.scale.zero: true
+      com.openfaas.scale.zero-duration: "30s"
+      com.openfaas.scale.min: "0"
+      com.openfaas.scale.max: "5"
+      
+  compute-intense-hi-tier:
+    lang: python3-http
+    handler: ./compute-intense
+    image: docker.io/bfridthekid/compute-intesive:0.1
+    annotations: { com.openfaas.scale.min: "3", com.openfaas.scale.max: "20" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 5
+    requests: { cpu: "25m", memory: "256Mi" }
+    limits:   { cpu: "500m", memory: "512Mi" }
+    labels:
+      com.openfaas.scale.zero: true             #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.zero-duration: "1s"    #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.min: "0"               #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      # CPU-based autoscaling - scale based on CPU usage
+      com.openfaas.scale.type: "cpu"              # Correct label (not .type)
+      com.openfaas.scale.target: "100"            # Target 100m CPU per pod  
+      com.openfaas.scale.target-proportion: "0.50"  # Scale at 50% (50m CPU)
+      # com.openfaas.scale.min: "3"
+      # com.openfaas.scale.max: "20"
+  
+  compute-intense-med-tier:
+    lang: python3-http
+    handler: ./compute-intense
+    image: docker.io/bfridthekid/compute-intesive:0.1
+    annotations: { com.openfaas.scale.min: "1", com.openfaas.scale.max: "10" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 5
+    requests: { cpu: "15m", memory: "128Mi" }
+    limits:   { cpu: "300m", memory: "256Mi" }
+    labels:
+      com.openfaas.scale.zero: true             #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.zero-duration: "1s"    #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.min: "0"               #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.type: "capacity"
+      com.openfaas.scale.target: "10"
+      com.openfaas.scale.target-proportion: "0.80"
+      # com.openfaas.scale.min: "1"
+      # com.openfaas.scale.max: "10"
+
+  compute-intense-low-tier:
+    lang: python3-http
+    handler: ./compute-intense
+    image: docker.io/bfridthekid/compute-intesive:0.1
+    annotations: { com.openfaas.scale.min: "0", com.openfaas.scale.max: "5" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 5
+    requests: { cpu: "5m",  memory: "64Mi" }
+    limits:   { cpu: "200m", memory: "128Mi" }
+    labels:
+      com.openfaas.scale.zero: true
+      com.openfaas.scale.zero-duration: "30s"
+      com.openfaas.scale.min: "0"
+      com.openfaas.scale.max: "5"
+      com.openfaas.scale.type: "capacity"
+      com.openfaas.scale.target: "10"
+      com.openfaas.scale.target-proportion: "0.80"
+      
+  tfidf-vectorize-hi-tier:
+    lang: python3-http-debian
+    handler: ./tfidf-vectorize
+    #image: docker.io/bfridthekid/tfidf-vectorize:0.1
+    image: docker.io/bfridthekid/tfidf-vectorize:0.1@sha256:c5e0907cd63f112da723cee77907ce137bbfe397ccba94282edf6cc192a7434f
+    annotations: { com.openfaas.scale.min: "3", com.openfaas.scale.max: "20" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 2
+      ack_wait: 5m
+      exec_timeout: 5m
+      read_timeout: 5m
+      write_timeout: 5m
+    requests: { cpu: "25m", memory: "512Mi" }
+    limits:   { cpu: "500m", memory: "1024Mi" }
+    labels:
+      # com.openfaas.scale.zero: true             #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      # com.openfaas.scale.zero-duration: "1s"    #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      # com.openfaas.scale.min: "0"               #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      # CPU-based autoscaling - scale based on CPU usage
+      # com.openfaas.scale.type: "cpu"              # Correct label (not .type)
+      # com.openfaas.scale.target: "100"            # Target 100m CPU per pod  
+      # com.openfaas.scale.target-proportion: "0.50"  # Scale at 50% (50m CPU)
+      com.openfaas.scale.type: "queue"
+      com.openfaas.scale.target: "1"
+      com.openfaas.scale.target-proportion: "1"
+      com.openfaas.scale.min: "3"
+      com.openfaas.scale.max: "20"
+    # volumes:
+      # - name: openfaas-fn-data-pvc
+        # persistentVolumeClaim:
+          # claimName: openfaas-fn-data-pvc
+    # volumeMounts:
+      # - name: openfaas-fn-data-pvc
+        # mountPath: /data
+    # profiles:
+    # - data-pvc-profile
+  
+  tfidf-vectorize-med-tier:
+    lang: python3-http-debian
+    handler: ./tfidf-vectorize
+    image: docker.io/bfridthekid/tfidf-vectorize:0.1@sha256:c5e0907cd63f112da723cee77907ce137bbfe397ccba94282edf6cc192a7434f
+    annotations: { com.openfaas.scale.min: "1", com.openfaas.scale.max: "10" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 1
+      ack_wait: 5m
+      exec_timeout: 5m
+      read_timeout: 5m
+      write_timeout: 5m
+    requests: { cpu: "15m", memory: "256Mi" }
+    limits:   { cpu: "300m", memory: "1024Mi" }
+    labels:
+      # com.openfaas.scale.zero: true             #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      # com.openfaas.scale.zero-duration: "1s"    #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      # com.openfaas.scale.min: "0"               #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.type: "capacity"
+      com.openfaas.scale.target: "10"
+      com.openfaas.scale.target-proportion: "0.80"
+      com.openfaas.scale.min: "1"
+      com.openfaas.scale.max: "10"
+    # volumes:
+      # - name: openfaas-fn-data-pvc
+        # persistentVolumeClaim:
+          # claimName: openfaas-fn-data-pvc
+    # volumeMounts:
+      # - name: openfaas-fn-data-pvc
+        # mountPath: /data
+    # profiles:
+    # - data-pvc-profile
+
+  tfidf-vectorize-low-tier:
+    lang: python3-http-debian
+    handler: ./tfidf-vectorize
+    image: docker.io/bfridthekid/tfidf-vectorize:0.1@sha256:c5e0907cd63f112da723cee77907ce137bbfe397ccba94282edf6cc192a7434f
+    annotations: { com.openfaas.scale.min: "0", com.openfaas.scale.max: "5" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 1
+      ack_wait: 5m
+      exec_timeout: 5m
+      read_timeout: 5m
+      write_timeout: 5m
+    requests: { cpu: "5m",  memory: "256Mi" }
+    limits:   { cpu: "200m", memory: "1024Mi" }
+    labels:
+      com.openfaas.scale.zero: true
+      com.openfaas.scale.zero-duration: "30s"
+      com.openfaas.scale.min: "0"
+      com.openfaas.scale.max: "5"
+      com.openfaas.scale.type: "capacity"
+      com.openfaas.scale.target: "10"
+      com.openfaas.scale.target-proportion: "0.80"
+    # volumes:
+      # - name: openfaas-fn-data-pvc
+        # persistentVolumeClaim:
+          # claimName: openfaas-fn-data-pvc
+    # volumeMounts:
+      # - name: openfaas-fn-data-pvc
+        # mountPath: /data
+    # profiles:
+    # - data-pvc-profile
+      
+  weather-hi-tier:
+    lang: python3-http
+    handler: ./weather
+    image: docker.io/bfridthekid/weather:0.1@sha256:fd24aa71adba2a1fce0a4369dbdb0bf5ab2b9a03c248f6bef2a95ca484e51f5f
+    annotations: { com.openfaas.scale.min: "3", com.openfaas.scale.max: "20" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 5
+    requests: { cpu: "25m", memory: "256Mi" }
+    limits:   { cpu: "500m", memory: "512Mi" }
+    labels:
+      com.openfaas.scale.zero: true             #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.zero-duration: "1s"    #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.min: "0"               #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      # CPU-based autoscaling - scale based on CPU usage
+      com.openfaas.scale.type: "cpu"              # Correct label (not .type)
+      com.openfaas.scale.target: "100"            # Target 100m CPU per pod  
+      com.openfaas.scale.target-proportion: "0.50"  # Scale at 50% (50m CPU)
+      # com.openfaas.scale.min: "3"
+      # com.openfaas.scale.max: "20"
+  
+  weather-med-tier:
+    lang: python3-http
+    handler: ./weather
+    image: docker.io/bfridthekid/weather:0.1@sha256:fd24aa71adba2a1fce0a4369dbdb0bf5ab2b9a03c248f6bef2a95ca484e51f5f
+    annotations: { com.openfaas.scale.min: "1", com.openfaas.scale.max: "10" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 5
+    requests: { cpu: "15m", memory: "128Mi" }
+    limits:   { cpu: "300m", memory: "256Mi" }
+    labels:
+      com.openfaas.scale.zero: true             #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.zero-duration: "1s"    #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.min: "0"               #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.type: "capacity"
+      com.openfaas.scale.target: "10"
+      com.openfaas.scale.target-proportion: "0.80"
+      # com.openfaas.scale.min: "1"
+      # com.openfaas.scale.max: "10"
+
+  weather-low-tier:
+    lang: python3-http
+    handler: ./weather
+    image: docker.io/bfridthekid/weather:0.1@sha256:fd24aa71adba2a1fce0a4369dbdb0bf5ab2b9a03c248f6bef2a95ca484e51f5f
+    annotations: { com.openfaas.scale.min: "0", com.openfaas.scale.max: "5" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 5
+    requests: { cpu: "5m",  memory: "64Mi" }
+    limits:   { cpu: "200m", memory: "128Mi" }
+    labels:
+      com.openfaas.scale.zero: true
+      com.openfaas.scale.zero-duration: "30s"
+      com.openfaas.scale.min: "0"
+      com.openfaas.scale.max: "5"
+      com.openfaas.scale.type: "capacity"
+      com.openfaas.scale.target: "10"
+      com.openfaas.scale.target-proportion: "0.80"
+      
+  word-search-hi-tier:
+    lang: python3-http
+    handler: ./word-search
+    image: docker.io/bfridthekid/word-search:0.1
+    annotations: { com.openfaas.scale.min: "3", com.openfaas.scale.max: "20" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 5
+    requests: { cpu: "25m", memory: "256Mi" }
+    limits:   { cpu: "500m", memory: "512Mi" }
+    labels:
+      com.openfaas.scale.zero: true             #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.zero-duration: "1s"    #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.min: "0"               #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      # CPU-based autoscaling - scale based on CPU usage
+      com.openfaas.scale.type: "cpu"              # Correct label (not .type)
+      com.openfaas.scale.target: "100"            # Target 100m CPU per pod  
+      com.openfaas.scale.target-proportion: "0.50"  # Scale at 50% (50m CPU)
+      # com.openfaas.scale.min: "3"
+      # com.openfaas.scale.max: "20"
+  
+  word-search-med-tier:
+    lang: python3-http
+    handler: ./word-search
+    image: docker.io/bfridthekid/word-search:0.1
+    annotations: { com.openfaas.scale.min: "1", com.openfaas.scale.max: "10" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 5
+    requests: { cpu: "15m", memory: "128Mi" }
+    limits:   { cpu: "300m", memory: "256Mi" }
+    labels:
+      com.openfaas.scale.zero: true             #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.zero-duration: "1s"    #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.min: "0"               #Uncomment this and comment out the other non-zero com.openfaas.scale.min setting, then redeploy when not using to save resources
+      com.openfaas.scale.type: "capacity"
+      com.openfaas.scale.target: "10"
+      com.openfaas.scale.target-proportion: "0.80"
+      # com.openfaas.scale.min: "1"
+      # com.openfaas.scale.max: "10"
+
+  word-search-low-tier:
+    lang: python3-http
+    handler: ./word-search
+    image: docker.io/bfridthekid/word-search:0.1
+    annotations: { com.openfaas.scale.min: "0", com.openfaas.scale.max: "5" }
+    #environment: { BUSY_MS: "0" }
+    environment: 
+      PYTHONUNBUFFERED: "1"
+      max_inflight: 5
+    requests: { cpu: "5m",  memory: "64Mi" }
+    limits:   { cpu: "200m", memory: "128Mi" }
+    labels:
+      com.openfaas.scale.zero: true
+      com.openfaas.scale.zero-duration: "30s"
+      com.openfaas.scale.min: "0"
+      com.openfaas.scale.max: "5"
+      com.openfaas.scale.type: "capacity"
+      com.openfaas.scale.target: "10"
+      com.openfaas.scale.target-proportion: "0.80"
+    
+  # hi-tier:
+    # lang: python3-http
+    # handler: ./hi-tier
+    # image: docker.io/davidmdocker22/hi-tier:0.1
+    # annotations: { com.openfaas.scale.min: "3", com.openfaas.scale.max: "20" }
+    # environment: { BUSY_MS: "0" }
+    # requests: { cpu: "250m", memory: "256Mi" }
+    # limits:   { cpu: "500m", memory: "512Mi" }
+
+  # med-tier:
+    # lang: python3-http
+    # handler: ./med-tier
+    # image: docker.io/davidmdocker22/med-tier:0.1
+    # annotations: { com.openfaas.scale.min: "1", com.openfaas.scale.max: "10" }
+    # environment: { BUSY_MS: "0" }
+    # requests: { cpu: "150m", memory: "128Mi" }
+    # limits:   { cpu: "300m", memory: "256Mi" }
+
+  # low-tier:
+    # lang: python3-http
+    # handler: ./low-tier
+    # image: docker.io/davidmdocker22/low-tier:0.1
+    # annotations: { com.openfaas.scale.min: "1", com.openfaas.scale.max: "5" }
+    # environment: { BUSY_MS: "0" }
+    # requests: { cpu: "50m",  memory: "64Mi" }
+    # limits:   { cpu: "200m", memory: "128Mi" }
+
+# References
+# https://www.google.com/search?q=is+there+a+max_inflight+for+the+queue+itself+and+for+each+function+open+faas&rlz=1C1CHBF_enUS1071US1071&oq=is+there+a+max_inflight+for+the+queue+itself+and+for+each+function+open+faas&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQIRiPAjIHCAIQIRiPAtIBCTEyODY4ajBqN6gCALACAA&sourceid=chrome&ie=UTF-8
+# https://docs.openfaas.com/architecture/autoscaling/
+# https://docs.openfaas.com/openfaas-pro/jetstream/
+# https://www.openfaas.com/blog/queue-based-scaling/

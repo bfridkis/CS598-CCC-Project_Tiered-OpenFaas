@@ -1,0 +1,26 @@
+{
+  "sleep": {
+    "headers": {
+      "xTier": "X-Tier",
+      "computeTime": "Compute-Time"
+    },
+    "computeSeconds": "5",
+    "body": ""
+  },
+  "word_count": {
+    "headers": {
+      "xTier": "X-Tier",
+      "computeTime": "Compute-Time"
+    },
+    "computeSeconds": "5",
+    "body": ""
+  },
+  "weather": {
+    "headers": {
+      "xTier": "X-Tier",
+      "computeTime": "Compute-Time"
+    },
+    "computeSeconds": "5",
+    "body": ""
+  }
+}

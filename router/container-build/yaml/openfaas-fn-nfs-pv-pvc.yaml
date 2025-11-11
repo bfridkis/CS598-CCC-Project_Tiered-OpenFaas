@@ -1,0 +1,34 @@
+# openfaas-fn-nfs-pv-pvc.yaml
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: openfaas-fn-nfs-pv
+  namespace: openfaas-fn
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany # The key mode for multi-node access
+  storageClassName: "nfs-manual"
+  persistentVolumeReclaimPolicy: Retain 
+  nfs:
+    # Use the internal ClusterIP DNS name
+    server: nfs-server.openfaas-tiering.svc.cluster.local 
+    path: "/app" 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-pvc
+  namespace: openfaas-fn
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: "nfs-manual"
+  resources:
+    requests:
+      storage: 5Gi
+
+# Reference (AI Generated)
+# https://www.google.com/search?q=is+there+anyway+to+make+more+than+one+node+able+to+mount+to+a+pvc+at+the+same+time+gke&sca_esv=fa0b78d7cd41bbf7&rlz=1C1CHBF_enUS1071US1071&udm=50&fbs=AIIjpHxU7SXXniUZfeShr2fp4giZ59Aj-dkSgmXWKpa2HWaBZPGTDZtOU71PjDWW70svawb4TiKb6PokaWg6Su7GAol6GbfhsoNPNfDeGZFrKMAYtPYB5tOTiF-6x3xCx5_EA2i1eXtfcGGWNEfFzUNg0T1f5sjSNuvUOTpv-9uRNxQqzbHXpjdjWAImfMxBl1YnSzHLzupy_SmIc-omJPvwIgIw1QSb7w&aep=1&ntc=1&sa=X&ved=2ahUKEwiq7J7M2OCQAxVAnGoFHVVIJFsQ2J8OegQIDBAE&biw=2560&bih=1214&dpr=0.75&mstk=AUtExfAHMDSF1qk1NwqQDYXUzDpNJ69oR2qcs_-kxHXa-IXxQKnJbta-RC4Is0SlOiY6MT-PpcmT23yUGiAUNTn0p0sW_MZUCVG9zG6enca-4zqPW6ItxSX730J9OpQpA6hcQ6pTjvCq97Qvk3x2OrzDg48-3o_PD6YC4lZFkDk5KNhzrdwj4tEHG0Lsq3CKAeP5CaudH5KW6YeHd2UpKB80JE7GG32_hmWcQLWBCOrTy81MI3jMWE7j5Z4fRQ&csuir=1

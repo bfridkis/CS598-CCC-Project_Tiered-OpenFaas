@@ -1,0 +1,49 @@
+# openfaas-patches.yaml
+
+# SUPPOSED TO BE A HELM UPDATE FILE, BUT THIS ISN'T WORKING AS EXPECTED/INTENDED...
+
+# --- OpenFaaS Pro Required Settings (ensure these are present to keep Pro features) ---
+openfaasPro: true
+openfaasLicense:
+  secretName: openfaas-license
+  secretKey: license
+# --------------------------------------------------------------------------------------
+
+# --- Queue Worker Configuration (for ackWait and max_inflight) ---
+nats:
+  consumer:
+    ackWait: 5m
+
+# This is where you specify the max_inflight value for the queue-worker.
+# It sets the 'maxInflight' environment variable in the queue-worker pod.
+jetstreamQueueWorker:
+  # Set the desired number of jetstream-queue-worker replicas
+  replicaCount: 3
+  mode: function
+  ackWait: 5m
+  ack_wait: 5m
+  maxInflight: 5
+  max_inflight: 5
+  consumer:
+    inactiveThreshold: 30s
+    # You might also set the ackWait and maxInflight here depending on chart version
+    maxInflight: 5
+    max_inflight: 5
+
+# --- Gateway Configuration (for LoadBalancer service) ---
+gateway:
+  replicaCount: 3
+  upstreamTimeout: 5m
+  writeTimeout: 5m
+  readTimeout: 5m
+  # Configure the Kubernetes Service for the Gateway
+  # Change the type from the default (ClusterIP) to LoadBalancer
+  service:
+    type: LoadBalancer
+    # If your cloud provider requires specific annotations for the LB (e.g., AWS, Azure), add them here:
+    # annotations:
+    #   service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    #   service.beta.kubernetes.io/azure-load-balancer-resource-group: "my-resource-group"
+  extraArgs:
+    queue-mode: "function"
+

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: openfaas-fn-data-pvc-inspector
+  namespace: openfaas-fn
+spec:
+  containers:
+  - name: openfaas-fn-data-pvc-inspector
+    image: busybox:stable
+    #image: alpine:3
+    command: ["tail"]
+    args: ["-f", "/dev/null"] # This keeps the pod running
+    volumeMounts:
+    - mountPath: "/data"
+      name: openfaas-fn-data-pvc
+  volumes:
+  - name: openfaas-fn-data-pvc
+    persistentVolumeClaim:
+      claimName: openfaas-fn-data-pvc

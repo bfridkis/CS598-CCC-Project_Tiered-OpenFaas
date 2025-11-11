@@ -1,0 +1,7 @@
+apiVersion: openfaas.com/v1
+kind: Profile
+metadata:
+  name: ml-node-selector
+spec:
+  nodeSelector:
+    my-label: ml-node

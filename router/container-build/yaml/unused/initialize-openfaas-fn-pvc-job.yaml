@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: initialize-openfaas-fn-pvc
+  namespace: openfaas-fn
+spec:
+  template:
+    spec:
+      containers:
+      - name: initialize-openfaas-fn-pvc-container
+        #image: alpine:latest # Or any image that has 'sh' and 'cp'
+        image: bfridthekid/openfaas-fn-data-pvc-init@sha256:c2a9f4312f1e271e98bb0ad95875abd21f54aebb42cf7b27c5da24641832dd25
+        command:  ["/bin/sh", "/scripts/init-container-script.sh"]
+        volumeMounts:
+        - name: openfaas-fn-data-pvc
+          mountPath: /data
+        - name: init-scripts-volume
+          mountPath: /scripts
+      volumes:
+        - name: openfaas-fn-data-pvc
+          persistentVolumeClaim:
+            claimName: openfaas-fn-data-pvc
+        - name: init-scripts-volume
+          configMap:
+            name: init-container-script-cm
+            defaultMode: 0755
+      restartPolicy: OnFailure # The Job will retry if the script fails, and stop when it succeeds

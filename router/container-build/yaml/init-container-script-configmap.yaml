@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-container-script-cm
+  namespace: openfaas-tiering
+data:
+  init-container-script.sh: |-
+    #!/bin/sh
+    
+    # $1 = SOURCE_DIR, $2 = DEST_DIR
+    copy_files() {
+        
+        if [ ! -d "$2" ]; then
+            echo "Destination directory $2 does not exist. Creating it..."
+            mkdir -p "$2"
+        fi
+        
+        if [ -z "$(ls -A "$2")" ]; then
+           echo "Destination directory $2 is empty. Copying files from $SOURCE_DIR..."
+           cp -r "$1"/* "$2"/
+           echo "Files copied successfully."
+        else
+           echo "Destination directory $2 is not empty. Skipping file copy."
+        fi
+    }
+    
+    echo "Starting init container script..."
+    
+    ## Copy sms-spam dataset (for tfidf ml function) and decompress
+    SOURCE_DIR="/datasets/sms-spam"
+    DEST_DIR="/data/datasets/sms-spam"
+    copy_files $SOURCE_DIR $DEST_DIR
+    
+    ## Copy Model (for tfidf model trained on sms-spam data)
+    SOURCE_DIR="/models/tfidf_vectorize_sms-spam"
+    DEST_DIR="/data/models/tfidf_vectorize_sms-spam"
+    copy_files $SOURCE_DIR $DEST_DIR
+    
+    ## Copy Vectorizer (for tfidf vectors for sms-spam data)
+    SOURCE_DIR="/vectorizers/tfidf_vectorize_sms-spam"
+    DEST_DIR="/data/vectorizers/tfidf_vectorize_sms-spam"
+    copy_files $SOURCE_DIR $DEST_DIR
+    
+    ## Copy amazon-reviews dataset (for tfidf ml function) and decompress
+    SOURCE_DIR="/datasets/amazon-reviews"
+    DEST_DIR="/data/datasets/amazon-reviews"
+    copy_files $SOURCE_DIR $DEST_DIR
+    if [ ! -f "$DEST_DIR/amazon-reviews-test.ft.txt" ]; then
+        echo "$DEST_DIR/amazon-reviews-test.ft.txt not found. Decompressing $SOURCE_DIR/amazon-reviews-test.ft.txt.bz2 now..."
+        bzip2 -dc $SOURCE_DIR/amazon-reviews-test.ft.txt.bz2 > $DEST_DIR/amazon-reviews-test.ft.txt
+        echo "Done decompressing. $DEST_DIR/amazon-reviews-test.ft.txt should now be present."
+    else
+        echo "$DEST_DIR/amazon-reviews-test.ft.txt already present."
+    fi
+    
+    ## Copy Model (for tfidf model trained on amazon-reviews data)
+    SOURCE_DIR="/models/tfidf_vectorize_amazon-reviews"
+    DEST_DIR="/data/models/tfidf_vectorize_amazon-reviews"
+    copy_files $SOURCE_DIR $DEST_DIR
+    
+    ## Copy Vectorizer (for tfidf vectors for amazon-reviews data)
+    SOURCE_DIR="/vectorizers/tfidf_vectorize_amazon-reviews"
+    DEST_DIR="/data/vectorizers/tfidf_vectorize_amazon-reviews"
+    copy_files $SOURCE_DIR $DEST_DIR
+    
+    
+    echo "Init container script finished."

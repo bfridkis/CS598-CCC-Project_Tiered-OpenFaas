@@ -1,0 +1,13 @@
+# Optional - Only Needed For Custom Name
+
+# storageclass.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: filestore-standard
+provisioner: filestore.csi.storage.gke.io
+parameters:
+  tier: BASIC_HDD
+  # For the Enterprise tier with multishare, tier: ENTERPRISE
+volumeBindingMode: Immediate
+allowVolumeExpansion: true

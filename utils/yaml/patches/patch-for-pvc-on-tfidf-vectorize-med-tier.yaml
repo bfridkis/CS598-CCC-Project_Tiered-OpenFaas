@@ -1,0 +1,26 @@
+# spec:
+  # template:
+    # spec:
+      # volumes:
+        # - name: "openfaas-fn-data-pvc"
+          # persistentVolumeClaim:
+            # claimName: "openfaas-fn-data-pvc"
+      # containers:
+        # - name: tfidf-vectorize-med-tier
+          # volumeMounts:
+            # - name: "openfaas-fn-data-pvc"
+              # mountPath: /data
+
+spec:
+  template:
+    spec:
+      volumes:
+        - name: "nfs-pvc"
+          persistentVolumeClaim:
+            claimName: "nfs-pvc"
+      containers:
+        - name: tfidf-vectorize-med-tier
+          volumeMounts:
+            - name: "nfs-pvc"
+              mountPath: /data
+

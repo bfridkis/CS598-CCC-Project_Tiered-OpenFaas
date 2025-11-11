@@ -1,0 +1,14 @@
+apiVersion: openfaas.com/v1
+kind: Profile
+metadata:
+  name: data-pvc-profile
+  namespace: openfaas
+spec:
+  containers:
+    volumeMounts:
+    - name: "openfaas-fn-data-pvc"
+      mountPath: "/data"
+  volumes:
+  - name: "openfaas-fn-data-pvc"
+    persistentVolumeClaim:
+      claimName: "openfaas-fn-data-pvc"

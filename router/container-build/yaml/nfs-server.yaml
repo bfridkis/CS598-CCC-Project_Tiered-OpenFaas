@@ -1,0 +1,59 @@
+# nfs-server.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nfs-server
+  namespace: openfaas-tiering
+  labels:
+    role: nfs-server
+spec:
+  ports:
+    - port: 2049 
+      name: nfs
+  selector:
+    role: nfs-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-server
+  namespace: openfaas-tiering
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: nfs-server
+  template:
+    metadata:
+      labels:
+        role: nfs-server
+    spec:
+      containers:
+        - name: nfs-server-container
+          # A pre-built container image that runs an NFS server
+          image: docker.io/adnanhodzic/nfs-server-k8s   # Finally found one that worked! Thanks adnanhodzic -- https://github.com/AdnanHodzic/nfs-server-k8s?tab=readme-ov-file
+          # env:
+          # - name: CONTAINERD_ENABLE_DEPRECATED_PULL_SCHEMA_1_IMAGE
+            # value: "1"
+          ports:
+            - name: nfs
+              containerPort: 2049
+          securityContext:
+            # Privileged access is required for the NFS kernel server
+            privileged: true 
+          volumeMounts:
+            - name: nfs-volume
+              mountPath: /exports # The directory that will be shared
+          # command: ["/bin/sh", "-c"]    # Can't get this to work for this image... Actually will make the directory but will then crash the container. Either deploy with this uncommented, delete the deployment, comment out, then re-apply/deploy, or use exec to make the /exports/app directory manually
+          # args:
+            # - mkdir -p /exports/app;
+      volumes:
+        - name: nfs-volume
+          gcePersistentDisk:
+            pdName: gce-nfs-disk # MUST match the name from Step 1
+            fsType: ext4          # K8s will format the disk automatically if needed
+
+# Reference (AI Generated)
+# https://www.google.com/search?q=is+there+anyway+to+make+more+than+one+node+able+to+mount+to+a+pvc+at+the+same+time+gke&sca_esv=fa0b78d7cd41bbf7&rlz=1C1CHBF_enUS1071US1071&udm=50&fbs=AIIjpHxU7SXXniUZfeShr2fp4giZ59Aj-dkSgmXWKpa2HWaBZPGTDZtOU71PjDWW70svawb4TiKb6PokaWg6Su7GAol6GbfhsoNPNfDeGZFrKMAYtPYB5tOTiF-6x3xCx5_EA2i1eXtfcGGWNEfFzUNg0T1f5sjSNuvUOTpv-9uRNxQqzbHXpjdjWAImfMxBl1YnSzHLzupy_SmIc-omJPvwIgIw1QSb7w&aep=1&ntc=1&sa=X&ved=2ahUKEwiq7J7M2OCQAxVAnGoFHVVIJFsQ2J8OegQIDBAE&biw=2560&bih=1214&dpr=0.75&mstk=AUtExfAHMDSF1qk1NwqQDYXUzDpNJ69oR2qcs_-kxHXa-IXxQKnJbta-RC4Is0SlOiY6MT-PpcmT23yUGiAUNTn0p0sW_MZUCVG9zG6enca-4zqPW6ItxSX730J9OpQpA6hcQ6pTjvCq97Qvk3x2OrzDg48-3o_PD6YC4lZFkDk5KNhzrdwj4tEHG0Lsq3CKAeP5CaudH5KW6YeHd2UpKB80JE7GG32_hmWcQLWBCOrTy81MI3jMWE7j5Z4fRQ&csuir=1
+# https://www.google.com/search?q=what+is+the+best+nfs-server+image+for+gke+nfs+pvc&sca_esv=f428b6d1b594cc50&rlz=1C1CHBF_enUS1071US1071&udm=50&fbs=AIIjpHxU7SXXniUZfeShr2fp4giZ59Aj-dkSgmXWKpa2HWaBZDtyvvIn4PVHl081BMOU6hoprXxfr-qpT0UGGVzMIyugYQSroB4nyOhUYDIWQxQEb3aOapJa4WmB8YO0ARQCwEEkWGWFu55-cA2nqEUW3eEM6F4VM6ntGmFvuJPhAFELSqPwUZTQUrWKr2mTAyt9Bz8ttHe5wsgPrwcS8sQ_uGK7xjTsXg&aep=1&ntc=1&sa=X&ved=2ahUKEwie9I_u8-CQAxUcg2oFHbxjM6MQ2J8OegQIDRAE&biw=2560&bih=1214&dpr=0.75&mstk=AUtExfCbOWbaq8G2XBmBxyuKu8_JelTRQopBw64wjBnrUR6BDhyC1medTf-esU9z0oyhxOjrzh-kbX10qElEVzcoonGIHQK2p8aegunam0kzpbR5jwVKbXE2y5ZlVCs-uVaqY_08ahpem-33xvV8PfB-rKwy0wjYxoNWqpAyd-Y-0HfiyFNjm2NZeD_WKvtHCLAmY_17bylPXPKQOT-GH51xcSQ0Rco0QzdjWRpUHezRk6HV5kNZad-xIuK4Tw&csuir=1
