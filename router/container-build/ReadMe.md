@@ -34,7 +34,9 @@ From container-build/yaml directory (e.g. `cd yaml`, if coming from previous ste
 - `kubectl apply -f nfs-server.yaml`
 
 2c) Exec into the file share server and create /exports/app directory 
-<small>Can't get cmd to work from deployment file above [nfs-server.yaml]. It will make the directory but then seems to crash the container. See line 48-50 in nfs-server.yaml. But because we are using gce persistent disk with 'persistentVolumeReclaimPolicy: Retain' in our persistent volume configuration, this directory only has to be created once, even if the nfs-server pod has to be recreated from image. The mounted nfs storage will not lose it's files.)</small>
+
+* <small>Can't get cmd to work from deployment file above [nfs-server.yaml]. It will make the directory but then seems to crash the container. See line 48-50 in nfs-server.yaml. But because we are using gce persistent disk with 'persistentVolumeReclaimPolicy: Retain' in our persistent volume configuration, this directory only has to be created once, even if the nfs-server pod has to be recreated from image. The mounted nfs storage will not lose it's files.)</small>
+
 - `kubectl get pods -l role=nfs-server -n openfaas-tiering    # Get name of nfs-server pod`
 
 - `kubectl exec -it <name-of-nfs-server-pod> -n openfaas-tiering -- /bin/bash    # Exec into it`
@@ -43,7 +45,7 @@ From container-build/yaml directory (e.g. `cd yaml`, if coming from previous ste
 
 - `exit`
 
-24) Define and Deploy the NFS PV and PVC - Links server service to logical pvc, so cluster apps can access mounted physical storage
+2d) Define and Deploy the NFS PV and PVC - Links server service to logical pvc, so cluster apps can access mounted physical storage
 - `kubectl apply -f nfs-pv-pvc.yaml`
 
 - `kubectl get pvc nfs-pvc -n openfaas-tiering    # Make sure pvc is bound`
