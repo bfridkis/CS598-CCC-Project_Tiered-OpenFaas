@@ -4,7 +4,7 @@ import requests
 
 def get_weather():
     # Enter your API key here
-    api_key = "542e3e3340ebc8675a5cf8c8880ae3e3"
+    api_key = "XXXXXXXXXXXXXXXXXXXXXX"
 
     # base_url variable to store url
     base_url = "http://pro.openweathermap.org/data/2.5/weather?"
