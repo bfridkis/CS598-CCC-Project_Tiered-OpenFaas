@@ -35,7 +35,7 @@ From container-build/yaml directory (e.g. `cd yaml`, if coming from previous ste
 
 2c) Exec into the file share server and create /exports/app directory 
 
-<small>[Can't get cmd to work from deployment file above [nfs-server.yaml]. It will make the directory but then seems to crash the container. See line 48-50 in nfs-server.yaml. But because we are using gce persistent disk with 'persistentVolumeReclaimPolicy: Retain' in our persistent volume configuration, this directory only has to be created once, even if the nfs-server pod has to be recreated from image. The mounted nfs storage will not lose it's files.)]</small>
+<small>[Can't get cmd to work from deployment file above [nfs-server.yaml]. It will make the directory but then seems to crash the container. See line 48-50 in nfs-server.yaml. But because we are using gce persistent disk with 'persistentVolumeReclaimPolicy: Retain' in our persistent volume configuration, this directory only has to be created once, even if the nfs-server pod has to be recreated from image. The mounted nfs storage will not lose it's files.]</small>
 
 - `kubectl get pods -l role=nfs-server -n openfaas-tiering    # Get name of nfs-server pod`
 
